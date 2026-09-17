@@ -87,30 +87,30 @@ void main() {
     expect(display(tester), '4');
   });
 
-
-  testWidgets('8  + 5, then divided by 0', (tester) async {
+  testWidgets('8 plus 5, then divided by 0', (tester) async {
     await tester.pumpWidget(const CalculatorApp());
 
-    for (final label in ['8','+','5',]) {
+    for (final label in ['8', '+', '5', '=']) {
       await tap(tester, label);
     }
     expect(display(tester), '13');
 
-    for (final label in [ '/', '0', '=']){
+    for (final label in ['÷', '0', '=']) {
       await tap(tester, label);
     }
 
     expect(display(tester), 'Error');
   });
 
-  testWidgets('8 times 7, but swapping from + to * before pressing 7', (tester) async {
+  testWidgets('8 times 7, but swapping from + to multiply before 7', (
+    tester,
+  ) async {
     await tester.pumpWidget(const CalculatorApp());
 
-    for (final label in ['8', '+', 'x', '7', '=']) {
+    for (final label in ['8', '+', '×', '7', '=']) {
       await tap(tester, label);
     }
 
     expect(display(tester), '56');
   });
-
 }

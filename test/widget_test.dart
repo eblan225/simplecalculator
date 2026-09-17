@@ -88,10 +88,15 @@ void main() {
   });
 
 
-  testWidgets('8 divided by 0', (tester) async {
+  testWidgets('8  + 5, then divided by 0', (tester) async {
     await tester.pumpWidget(const CalculatorApp());
 
-    for (final label in ['8', '/', '0', '=']) {
+    for (final label in ['8','+','5',]) {
+      await tap(tester, label);
+    }
+    expect(display(tester), '13');
+
+    for (final label in [ '/', '0', '=']){
       await tap(tester, label);
     }
 

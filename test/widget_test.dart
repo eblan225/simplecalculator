@@ -76,4 +76,36 @@ void main() {
     expect(display(tester), 'Error');
     expect(find.text('Cannot divide by zero'), findsOneWidget);
   });
+
+  testWidgets('two plus two', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+
+    for (final label in ['2', '+', '2', '=']) {
+      await tap(tester, label);
+    }
+
+    expect(display(tester), '4');
+  });
+
+
+  testWidgets('8 divided by 0', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+
+    for (final label in ['8', '/', '0', '=']) {
+      await tap(tester, label);
+    }
+
+    expect(display(tester), 'Error');
+  });
+
+  testWidgets('8 times 7, but swapping from + to * before pressing 7', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+
+    for (final label in ['8', '+', 'x', '7', '=']) {
+      await tap(tester, label);
+    }
+
+    expect(display(tester), '56');
+  });
+
 }

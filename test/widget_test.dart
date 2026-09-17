@@ -1,30 +1,79 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:simplecalculator/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  Future<void> tap(WidgetTester tester, String label) async {
+    await tester.tap(find.byKey(Key('button-$label')));
     await tester.pump();
+  }
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  String display(WidgetTester tester) =>
+      tester.widget<Text>(find.byKey(const Key('calculator-display'))).data!;
+
+  testWidgets('shows one complete calculator screen', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+    expect(find.text('Calculator'), findsOneWidget);
+    for (final label in [
+      'AC',
+      '⌫',
+      '%',
+      '÷',
+      '7',
+      '8',
+      '9',
+      '×',
+      '4',
+      '5',
+      '6',
+      '−',
+      '1',
+      '2',
+      '3',
+      '+',
+      '±',
+      '0',
+      '.',
+      '=',
+    ]) {
+      expect(find.byKey(Key('button-$label')), findsOneWidget);
+    }
+  });
+
+  testWidgets('performs chained arithmetic', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+    for (final label in ['1', '2', '+', '7', '×', '2', '=']) {
+      await tap(tester, label);
+    }
+    expect(display(tester), '38');
+  });
+
+  testWidgets('multiply button uses the x operator', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+    for (final label in ['6', '×', '7', '=']) {
+      await tap(tester, label);
+    }
+    expect(display(tester), '42');
+  });
+
+  testWidgets('handles decimal, sign, percent, and clear', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+    for (final label in ['5', '.', '5', '±']) {
+      await tap(tester, label);
+    }
+    expect(display(tester), '-5.5');
+    await tap(tester, '%');
+    expect(display(tester), '-0.055');
+    await tap(tester, 'AC');
+    expect(display(tester), '0');
+  });
+
+  testWidgets('reports divide by zero without crashing', (tester) async {
+    await tester.pumpWidget(const CalculatorApp());
+    for (final label in ['8', '÷', '0', '=']) {
+      await tap(tester, label);
+    }
+    expect(display(tester), 'Error');
+    expect(find.text('Cannot divide by zero'), findsOneWidget);
   });
 }
